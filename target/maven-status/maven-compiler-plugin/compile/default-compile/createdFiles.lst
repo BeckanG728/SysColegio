@@ -1,4 +1,3 @@
-com\bsager\syscolegio\dto\request\Login.class
 com\bsager\syscolegio\model\Grado.class
 com\bsager\syscolegio\model\Matricula.class
 com\bsager\syscolegio\cipher\CifradoCesar.class
@@ -19,13 +18,17 @@ com\bsager\syscolegio\servlet\RegistrarAlumnoServlet.class
 com\bsager\syscolegio\servlet\LoginServlet.class
 com\bsager\syscolegio\controller\UsuarioJpaController.class
 com\bsager\syscolegio\controller\exceptions\NonexistentEntityException.class
+com\bsager\syscolegio\util\Base64Util.class
 com\bsager\syscolegio\util\HashUtil.class
 com\bsager\syscolegio\controller\exceptions\IllegalOrphanException.class
 com\bsager\syscolegio\service\PagoService.class
+com\bsager\syscolegio\dto\response\ErrorResponse.class
 com\bsager\syscolegio\servlet\ListarAulasServlet.class
 com\bsager\syscolegio\servlet\MatricularServlet.class
 com\bsager\syscolegio\servlet\PagoServlet.class
 com\bsager\syscolegio\service\MatriculaService.class
+com\bsager\syscolegio\dto\request\LoginRequest.class
 com\bsager\syscolegio\model\Nivel.class
+com\bsager\syscolegio\dto\response\LoginResponse.class
 com\bsager\syscolegio\model\Pago.class
 com\bsager\syscolegio\servlet\BuscarAlumnoServlet.class
