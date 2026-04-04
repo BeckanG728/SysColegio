@@ -6,11 +6,11 @@ import com.bsager.syscolegio.dto.request.LoginRequest;
 import com.bsager.syscolegio.dto.response.ErrorResponse;
 import com.bsager.syscolegio.dto.response.LoginResponse;
 import com.bsager.syscolegio.service.UsuarioService;
-import com.bsager.syscolegio.util.Base64Util;
 import com.bsager.syscolegio.util.HashUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,24 +30,30 @@ public class LoginServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("text/plain;charset=UTF-8");
+        String jsonRespuesta;
         
         try (PrintWriter out = response.getWriter()) {
             
-            // 1. Leer el JSON del cuerpo { username, password }
-            LoginRequest objeto = mapper.readValue(request.getInputStream(), LoginRequest.class);
- 
-            // 2. Decodificar: Base64 -> César -> texto plano
-            String user = CifradoCesar.descifrar(Base64Util.decode(objeto.username()));
-            String pass = CifradoCesar.descifrar(Base64Util.decode(objeto.password()));
- 
-            // 3. Hashear la contraseña en SHA-256 (el SP compara con el hash)
+            // Obtiene el texto cifrado
+            String bodyCifrado = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            
+            // Decifra el mensaje, a un json plano
+            String bodyPlano = CifradoCesar.descifrar(bodyCifrado);
+            
+            // Parsea a objeto POJO
+            LoginRequest objeto = mapper.readValue(bodyPlano, LoginRequest.class);
+            String user = objeto.username();
+            String pass = objeto.password();
+           
+            // Construye el hash de la contraseña
             String passHash = HashUtil.sha256(pass);
- 
-            // 4. Llamar al servicio
+            
+            // Realiza la consulta
             LoginResponse resp = service.login(user, passHash);
  
-            String jsonRespuesta;
- 
+            
+            // Logica de respuesta
             if (resp == null || "error".equals(resp.resultado())) {
                 // LoginRequest fallido
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
@@ -59,12 +65,11 @@ public class LoginServlet extends HttpServlet {
                 HttpSession sesion = request.getSession(true);
                 sesion.setAttribute("codiUsua", resp.codiUsua());
                 sesion.setMaxInactiveInterval(30 * 60); // 30 minutos
- 
                 response.setStatus(HttpServletResponse.SC_OK); // 200
                 jsonRespuesta = mapper.writeValueAsString(resp);
             }
  
-            // 5. Cifrar respuesta con César y enviar
+            // Cifrar respuesta con César y envia al frontend
             out.print(CifradoCesar.cifrar(jsonRespuesta));
  
         } catch (Exception e) {
