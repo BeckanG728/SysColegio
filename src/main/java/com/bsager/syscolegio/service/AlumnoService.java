@@ -32,7 +32,7 @@ public class AlumnoService {
     public AlumnoResponse findByDNI(String dni) {
         EntityManager em = alumnoCtrl.getEntityManager();
         try {
-            StoredProcedureQuery sp = em.createNamedStoredProcedureQuery("sp_buscar_alumno_dni")
+            StoredProcedureQuery sp = em.createStoredProcedureQuery("sp_buscar_alumno_dni")
                     .registerStoredProcedureParameter("_dni", String.class, ParameterMode.IN)
                     .registerStoredProcedureParameter("_resultado", String.class, ParameterMode.OUT)
                     .setParameter("_dni", dni);

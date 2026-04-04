@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,14 +24,20 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author chila
  */
-@WebServlet(name = "BuscarAlumnoServlet", urlPatterns = {"/alumno/buscar"})
+@WebServlet(name = "BuscarAlumnoServlet", urlPatterns = {"/app/alumno/buscar"})
 public class BuscarAlumnoServlet extends HttpServlet {
 
     
     private final AlumnoService service = new AlumnoService();
+    private static final Logger LOG = Logger.getLogger(BuscarAlumnoServlet.class.getName());
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        String ip = request.getRemoteAddr();
+        String metodo = request.getMethod();
+        LOG.info(String.format("[REQUEST] %s %s desde %s", metodo, request.getRequestURI(), ip));
+        
         response.setContentType("text/plain;charset=UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         String jsonResponse;

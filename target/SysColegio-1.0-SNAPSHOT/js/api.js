@@ -17,7 +17,7 @@ $("search").addEventListener("click", async () =>{
         return;
     }
 
-    let payload = {dni:dni};
+    let payload = {dni:dni.value.trim()};
 
     try {
         const resp = await apiCall("alumno/buscar",payload);
@@ -25,7 +25,7 @@ $("search").addEventListener("click", async () =>{
         if (resp.resultado === "ok") {
             console.log(resp)
         } else {
-            $("mensaje").textContent = response.mensaje;
+            $("mensaje").textContent = resp.mensaje;
         }
     } catch (error) {
         console.error(error);
