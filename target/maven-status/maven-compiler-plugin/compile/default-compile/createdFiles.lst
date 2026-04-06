@@ -14,6 +14,7 @@ com\bsager\syscolegio\model\Concepto.class
 com\bsager\syscolegio\service\UsuarioService.class
 com\bsager\syscolegio\model\Usuario.class
 com\bsager\syscolegio\controller\MatriculaJpaController.class
+com\bsager\syscolegio\dto\response\AlumnoRegisterResponse.class
 com\bsager\syscolegio\util\JpaUtil.class
 com\bsager\syscolegio\servlet\RegistrarAlumnoServlet.class
 com\bsager\syscolegio\servlet\LoginServlet.class
@@ -29,6 +30,7 @@ com\bsager\syscolegio\servlet\MatricularServlet.class
 com\bsager\syscolegio\servlet\PagoServlet.class
 com\bsager\syscolegio\service\MatriculaService.class
 com\bsager\syscolegio\dto\request\LoginRequest.class
+com\bsager\syscolegio\dto\request\AlumnoRegisterRequest.class
 com\bsager\syscolegio\model\Nivel.class
 com\bsager\syscolegio\dto\response\LoginResponse.class
 com\bsager\syscolegio\model\Pago.class

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,9 +13,9 @@
             <a href="pagos.html" class="link">Realizar pagos</a>
             <a href="registrar-alumno.html" class="link">Registrar alumno</a>
         </div>
-        <div class="list">
+        <div class="list-alumnos">
             <H2>ALUMNOS REGISTRADOS</H2>
-            <button id="btnListar">Listar</button>
+            <button id="btn-listar-alumnos">Listar</button>
             <table border="1" id="table-alumnos">
                 <thead>
                     <tr>
@@ -26,8 +26,36 @@
                 <tbody>
                 </tbody>
             </table>
-
+        </div>
+        <div class="list-aulas">
+            <H2>AULAS</H2>
+            <button id="btn-listar-aulas">Listar aulas</button>
+            <table border="1" id="table-aulas">
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody id="list-alumnos-tbody"></tbody>
+            </table>
         </div>
     </div>
 </body>
 </html>
+
+public List<AulaResponse> findAllAulas(){
+        EntityManager em = aulaCtrl.getEntityManager();
+        
+        TypedQuery<AulaResponse> query = em.createQuery("select * from v_listar_aulas",AulaResponse.class);
+        
+        List<AulaResponse> list = query.getResultList();
+        if (list == null || list.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        return mapper.convertValue(
+            list,
+            new TypeReference<List<AulaResponse>>() {}
+        );
+    }

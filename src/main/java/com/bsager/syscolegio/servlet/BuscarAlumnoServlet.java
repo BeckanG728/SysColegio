@@ -11,10 +11,10 @@ import com.bsager.syscolegio.dto.response.ErrorResponse;
 import com.bsager.syscolegio.service.AlumnoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,39 +38,50 @@ public class BuscarAlumnoServlet extends HttpServlet {
         String metodo = request.getMethod();
         LOG.info(String.format("[REQUEST] %s %s desde %s", metodo, request.getRequestURI(), ip));
         
-        response.setContentType("text/plain;charset=UTF-8");
+        response.setContentType("application/octet-stream");
         ObjectMapper mapper = new ObjectMapper();
-        String jsonResponse;
         
-        try (PrintWriter out = response.getWriter()) {
-            String bodyCifrado = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        
+        try {
             
-            String bodyPlano = CifradoCesar.descifrar(bodyCifrado);
+            // Recuperar bytes encriptados
+            byte [] raw = request.getInputStream().readAllBytes();
             
-            AlumnoRequest object = mapper.readValue(bodyPlano, AlumnoRequest.class);
+            // Desencripta y transforma a json plano
+            String jsonPlano = CifradoCesar.decrypt(raw);
+            LOG.info(String.format("[PROCESS] encrypted: %s - data: %s", Arrays.toString(raw), jsonPlano));
+            
+            // Mapea a POJO
+            AlumnoRequest object = mapper.readValue(jsonPlano, AlumnoRequest.class);
             
             AlumnoResponse resp = service.findByDNI(object.dni());
             
+            
+            String jsonResponse;
             if(resp == null || "error".equals(resp.resultado())){
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND); // 401
-                String mensaje = "Alumno no encontrado";
-                ErrorResponse error = new ErrorResponse("error", mensaje);
+                ErrorResponse error = new ErrorResponse("error", "Alumno no encontrado");
                 jsonResponse = mapper.writeValueAsString(error);
             } else {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse = mapper.writeValueAsString(resp);
             }
             
-            // Cifrar respuesta con César y envia al frontend
-            out.print(CifradoCesar.cifrar(jsonResponse));
             
-        } catch (Exception e) {
+            ServletOutputStream out = response.getOutputStream();
+            byte [] dataEncrypted = CifradoCesar.encrypt(jsonResponse);
+            out.write(dataEncrypted);
+            out.flush();
+            
+        } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            try (PrintWriter out = response.getWriter()) {
-                ErrorResponse error = new ErrorResponse("error", "Error procesando la solicitud");
-                out.print(CifradoCesar.cifrar(mapper.writeValueAsString(error)));
-            }
-
+            ErrorResponse error = new ErrorResponse("error", "Error procesando la solicitud");
+            String jsonError = mapper.writeValueAsString(error);
+            byte [] dataEncrypted = CifradoCesar.encrypt(jsonError);
+            
+            ServletOutputStream out = response.getOutputStream();
+            out.write(dataEncrypted);
+            out.flush();
         }
     }
 

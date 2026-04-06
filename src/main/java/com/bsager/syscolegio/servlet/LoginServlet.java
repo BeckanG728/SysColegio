@@ -1,4 +1,3 @@
-
 package com.bsager.syscolegio.servlet;
 
 import com.bsager.syscolegio.cipher.CifradoCesar;
@@ -9,9 +8,10 @@ import com.bsager.syscolegio.service.UsuarioService;
 import com.bsager.syscolegio.util.HashUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,61 +24,81 @@ import javax.servlet.http.HttpSession;
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-    
+
     private final UsuarioService service = new UsuarioService();
+    private static final Logger LOG = Logger.getLogger(LoginServlet.class.getName());
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ObjectMapper mapper = new ObjectMapper();
-        response.setContentType("text/plain;charset=UTF-8");
-        String jsonRespuesta;
-        
-        try (PrintWriter out = response.getWriter()) {
+        response.setContentType("application/octet-stream");
+
+        String ip = request.getRemoteAddr();
+        String metodo = request.getMethod();
+        LOG.info(String.format("[REQUEST] %s %s desde %s", metodo, request.getRequestURI(), ip));
+        try {
+
+            // 1. Leer bytes del request
+            byte[] raw = request.getInputStream().readAllBytes();
+
+            // 2. Descifrar
+            String decrypted = CifradoCesar.decrypt(raw);
             
-            // Obtiene el texto cifrado
-            String bodyCifrado = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            
-            // Decifra el mensaje, a un json plano
-            String bodyPlano = CifradoCesar.descifrar(bodyCifrado);
-            
-            // Parsea a objeto POJO
-            LoginRequest objeto = mapper.readValue(bodyPlano, LoginRequest.class);
+            LOG.info(String.format("[PROCESS] data: %s - encrypted: %s", Arrays.toString(raw), decrypted));
+
+            // 3. Parsear JSON
+            LoginRequest objeto = mapper.readValue(decrypted, LoginRequest.class);
             String user = objeto.username();
             String pass = objeto.password();
-           
-            // Construye el hash de la contraseña
+
+            // 4. Hash
             String passHash = HashUtil.sha256(pass);
-            
-            // Realiza la consulta
+
+            // 5. Lógica negocio
             LoginResponse resp = service.login(user, passHash);
- 
-            
-            // Logica de respuesta
+
+            String jsonRespuesta;
+
             if (resp == null || "error".equals(resp.resultado())) {
-                // LoginRequest fallido
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-                String mensaje = (resp != null) ? "Credenciales incorrectas" : "Error interno";
-                ErrorResponse error = new ErrorResponse("error", mensaje);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                ErrorResponse error = new ErrorResponse(
+                        "error",
+                        (resp != null) ? "Credenciales incorrectas" : "Error interno"
+                );
                 jsonRespuesta = mapper.writeValueAsString(error);
+
             } else {
-                // LoginRequest exitoso -> crear sesión
                 HttpSession sesion = request.getSession(true);
                 sesion.setAttribute("codiUsua", resp.codiUsua());
-                sesion.setMaxInactiveInterval(30 * 60); // 30 minutos
-                response.setStatus(HttpServletResponse.SC_OK); // 200
+                sesion.setMaxInactiveInterval(30 * 60);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonRespuesta = mapper.writeValueAsString(resp);
             }
- 
-            // Cifrar respuesta con César y envia al frontend
-            out.print(CifradoCesar.cifrar(jsonRespuesta));
- 
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            try (PrintWriter out = response.getWriter()) {
-                ErrorResponse error = new ErrorResponse("error", "Error procesando la solicitud");
-                out.print(CifradoCesar.cifrar(mapper.writeValueAsString(error)));
-            }
 
+            // 6. CIFRAR → BYTES
+            byte[] encrypted = CifradoCesar.encrypt(jsonRespuesta);
+
+            // 7. ESCRIBIR COMO BYTES
+            ServletOutputStream out = response.getOutputStream();
+            out.write(encrypted);
+            
+            LOG.info(String.format("[RESPONSE] data: %s - encrypted: %s", jsonRespuesta, Arrays.toString(encrypted)));
+            
+            out.flush();
+
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            ErrorResponse error = new ErrorResponse(
+                    "error",
+                    "Error procesando la solicitud"
+            );
+            
+            String jsonError = mapper.writeValueAsString(error);
+            byte[] encrypted = CifradoCesar.encrypt(jsonError);
+            
+            ServletOutputStream out = response.getOutputStream();
+            out.write(encrypted);
+            out.flush();
         }
     }
 

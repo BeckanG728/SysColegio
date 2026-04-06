@@ -42,9 +42,9 @@ public class SessionFilter implements Filter {
             String jsonError
                     = "{\"resultado\":\"error\"," + "\"mensaje\":\"Sesion expirada o no iniciada\"}";
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
-            resp.setContentType("text/plain;charset=UTF-8");
+            resp.setContentType("application/octet-stream");
             try (PrintWriter out = resp.getWriter()) {
-                out.print(CifradoCesar.cifrar(jsonError));
+                out.print(CifradoCesar.encrypt(jsonError));
             }
         // No llamar chain.doFilter -> peticion bloqueada
         }

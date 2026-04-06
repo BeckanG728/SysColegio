@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrar alumno</title>
+</head>
+
+<body>
+    <form id="form-registro">
+        <div>
+            <label for="dni">DNI</label>
+            <input type="text" name="dni" id="dni" pattern="[1-9][0-9]{7}" required/>
+        </div>
+        <div>
+            <label for="appa">Apellido paterno</label>
+            <input type="text" name="appa" id="appa" pattern="[A-Za-zñÑ]{2,}" required/>
+        </div>
+        <div>
+            <label for="apma">Apellido materno</label>
+            <input type="text" name="apma" id="apma" pattern="[A-Za-zñÑ]{2,}" required/>
+        </div>
+
+        <div>
+            <label for="nomb">Nombre</label>
+            <input type="text" name="nomb" id="nomb" pattern="[A-Za-zñÑ]{2,}" required/>
+        </div>
+
+        <div>
+            <label for="corr">Correo</label>
+            <input type="email" name="corr" id="corr" />
+        </div>
+
+        <div>
+            <labe for="cel">Celular</labe>
+            <input type="text" name="cel" id="cel" pattern="[9][0-9]{8}"/>
+        </div>
+
+        <div>
+            <label for="sexo">Sexo</label>
+            <select name="sexo" id="sexo" required>
+                <option value="M">M</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+        <br>
+        <button id="registrar-alumno">Registrar</button>
+    </form>
+    <p id="mensaje"></p>
+    <script type="module" src="../js/main.js"></script>
+</body>
+
+</html>

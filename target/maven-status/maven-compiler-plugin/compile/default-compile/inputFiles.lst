@@ -10,6 +10,7 @@ C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\sr
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\model\Matricula.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\controller\AlumnoJpaController.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\servlet\MatricularServlet.java
+C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\dto\response\AlumnoRegisterResponse.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\servlet\RegistrarAlumnoServlet.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\model\Alumno.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\model\Aula.java
@@ -18,6 +19,7 @@ C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\sr
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\model\Usuario.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\servlet\BuscarAlumnoServlet.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\controller\MatriculaJpaController.java
+C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\dto\request\AlumnoRegisterRequest.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\dto\request\AlumnoRequest.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\dto\response\AlumnoResponse.java
 C:\Users\chila\Desktop\Proyectos\Universidad\2026-I\criptografia-2\SysColegio\src\main\java\com\bsager\syscolegio\controller\AulaJpaController.java

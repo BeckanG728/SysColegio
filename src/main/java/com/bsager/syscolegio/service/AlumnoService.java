@@ -1,11 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 
 package com.bsager.syscolegio.service;
 
 import com.bsager.syscolegio.controller.AlumnoJpaController;
+import com.bsager.syscolegio.dto.request.AlumnoRegisterRequest;
+import com.bsager.syscolegio.dto.response.AlumnoRegisterResponse;
 import com.bsager.syscolegio.dto.response.AlumnoResponse;
 import com.bsager.syscolegio.util.JpaUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,5 +47,39 @@ public class AlumnoService {
         }
         return null;
     }
+    
+    public AlumnoRegisterResponse register(AlumnoRegisterRequest request){
+        EntityManager em = alumnoCtrl.getEntityManager();
+        try {
+            StoredProcedureQuery sp = em.createStoredProcedureQuery("sp_registrar_alumno")
+                    .registerStoredProcedureParameter("_dni", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_appa", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_apma", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_nomb", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_corr", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_cel", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_sexo", String.class, ParameterMode.IN)
+                    .registerStoredProcedureParameter("_resultado", String.class, ParameterMode.OUT)
+                    .setParameter("_dni", request.dni())
+                    .setParameter("_appa", request.appa())
+                    .setParameter("_apma", request.apma())
+                    .setParameter("_nomb", request.nomb())
+                    .setParameter("_corr", request.corr())
+                    .setParameter("_cel", request.cel())
+                    .setParameter("_sexo", request.sexo());
+            
+            sp.execute();
+            
+            Object object = sp.getOutputParameterValue("_resultado");
+            
+            return mapper.readValue(object.toString(), AlumnoRegisterResponse.class);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(AlumnoService.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            em.close();
+        }
+        return null;
+    }
+    
 
 }
